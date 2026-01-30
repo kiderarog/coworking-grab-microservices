@@ -1,8 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
-  }
+    public getHello(): string {
+        return 'API-Gateway service is running!';
+    }
+
+
+    public health() {
+        return {
+            status: "ok",
+            timestamp: new Date().toISOString()
+        }
+    }
+
 }

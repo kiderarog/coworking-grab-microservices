@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth-service-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - base_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api-gateway:
+    build: ./apps/api-gateway
+    env_file: ./apps/api-gateway/.env
+    depends_on:
+      - auth-service
+    networks:
+      - base_network
+    ports:
+      - "4000:4000"
+
+  auth-service:
+    build: ./apps/auth-service
+    env_file: ./apps/auth-service/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/auth-service-db?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - base_network
+    ports:
+      - "4001:4001"
+
+
+
+volumes:
+  auth_db_data:
+
+networks:
+  base_network:
+    driver: bridge
