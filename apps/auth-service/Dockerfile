@@ -19,7 +19,10 @@ RUN apt-get update && \
 COPY package*.json ./
 RUN npm install --omit=dev
 
+# ✔️ Копируем dist из auth-service
 COPY --from=builder /app/dist ./dist
+
+# ✔️ Prisma и скрипт тоже из auth-service
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/wait-for-db.sh ./wait-for-db.sh

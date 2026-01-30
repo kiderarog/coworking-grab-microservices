@@ -8,4 +8,4 @@ echo "Using DATABASE_URL=$DATABASE_URL"
 npx prisma generate
 npx prisma db push
 echo "Schema synced. Starting NestJS..."
-exec npm run start:prod
+exec node dist/src/main.js
