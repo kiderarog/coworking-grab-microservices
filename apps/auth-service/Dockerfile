@@ -6,6 +6,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+RUN npx prisma generate
 RUN npm run build
 
 # ---------- PRODUCTION STAGE ----------
@@ -19,15 +20,11 @@ RUN apt-get update && \
 COPY package*.json ./
 RUN npm install --omit=dev
 
-# ✔️ Копируем dist из auth-service
 COPY --from=builder /app/dist ./dist
-
-# ✔️ Prisma и скрипт тоже из auth-service
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+#COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 COPY --from=builder /app/wait-for-db.sh ./wait-for-db.sh
 
 RUN chmod +x ./wait-for-db.sh
-
 EXPOSE 4001
-CMD ["./wait-for-db.sh"]
+CMD ["bash", "/app/wait-for-db.sh"]
