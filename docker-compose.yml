@@ -33,7 +33,7 @@ services:
     build: ./apps/auth-service
     env_file: ./apps/auth-service/.env
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/auth-service-db?schema=public
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/auth-service-db?schema=public"
     depends_on:
       db:
         condition: service_healthy
@@ -41,6 +41,8 @@ services:
       - base_network
     ports:
       - "4001:4001"
+      - "51212:51212"
+
 
 
 

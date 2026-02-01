@@ -22,7 +22,7 @@ RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-#COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/wait-for-db.sh ./wait-for-db.sh
 
 RUN chmod +x ./wait-for-db.sh
