@@ -11,9 +11,10 @@ import { Role } from '../../generated/prisma/enums';
 import { LogInDto } from './dto/login-dto';
 import { prisma } from '../prisma';
 import * as bcrypt from 'bcrypt';
-import { JwtPayload } from './jwt.interface';
+// import { JwtPayload } from './jwt.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
+import {JwtPayload} from "../security";
 
 @Injectable()
 export class AuthService {
