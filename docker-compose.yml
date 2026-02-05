@@ -19,6 +19,35 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    container_name: redis
+    image: redis:6.2
+    restart: always
+    command: redis-server --requirepass 123456
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - base_network
+
+  rabbitmq:
+    image: rabbitmq:4.2.3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: USER
+      RABBITMQ_DEFAULT_PASS: "123456"
+
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - base_network
+
+
   api-gateway:
     build: ./apps/api-gateway
     env_file: ./apps/api-gateway/.env
@@ -37,6 +66,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
     networks:
       - base_network
     ports:
@@ -48,6 +81,8 @@ services:
 
 volumes:
   auth_db_data:
+  redis_data:
+  rabbitmq_data:
 
 networks:
   base_network:

@@ -3,6 +3,7 @@ import {AuthService} from './auth.service';
 import {CreateUserDto} from './dto/create-user.dto';
 import type {Response, Request} from 'express';
 import {LogInDto} from './dto/login-dto';
+import {Authorization, JwtPayload} from "../security";
 
 @Controller('auth')
 export class AuthController {
@@ -33,5 +34,11 @@ export class AuthController {
     @Post('refresh')
     async refreshToken(@Req() req: Request) {
         return await this.authService.refresh(req);
+    }
+
+    @Post('request-email-verification')
+    @Authorization()
+    async requestEmailVerification(@Req() req: Request) {
+        return await this.authService.generateAndSendOtp((req.user as JwtPayload).id);
     }
 }

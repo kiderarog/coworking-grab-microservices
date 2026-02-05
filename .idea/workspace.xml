@@ -6,9 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="daec9f72-db7f-4525-820e-9c3a25e7d6be" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/auth-service/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/auth-service/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/auth-service/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/src/app.module.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.controller.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.module.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

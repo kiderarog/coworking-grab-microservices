@@ -14,6 +14,9 @@ import * as bcrypt from 'bcrypt';
 import {CreateUserDto} from './dto/create-user.dto';
 import {JwtService} from '@nestjs/jwt';
 import {JwtPayload} from "../security";
+import * as crypto from 'crypto';
+import {RedisService} from "../redis/redis.service";
+import {MessagingService} from "../messaging/messaging.service";
 
 @Injectable()
 export class AuthService {
@@ -24,6 +27,8 @@ export class AuthService {
     constructor(
         private readonly configService: ConfigService,
         private readonly jwtService: JwtService,
+        private readonly redisService: RedisService,
+        private readonly messagingService: MessagingService
     ) {
         this.JWT_ACCESS_TOKEN_TTL = configService.getOrThrow(
             'JWT_ACCESS_TOKEN_TTL',
@@ -183,5 +188,43 @@ export class AuthService {
         }
     }
 
+    async generateAndSendOtp(userId: string) {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            }, select: {
+                id: true,
+                name: true,
+                email: true,
+                emailVerified: true
+            }
+        });
+        if (!user) {
+            throw new NotFoundException("User not found");
+        }
+        if (user.emailVerified) {
+            throw new ConflictException("This user already has verified email");
+        }
 
+        try {
+            const otp = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
+
+            await this.redisService.getClient().set(
+                `otp:email:${user.email}`,
+                otp,
+                'EX',
+                300,
+            );
+
+            await this.messagingService.otpRequested({
+                userId,
+                otp,
+                email: user.email
+            });
+        } catch (error) {
+            throw new InternalServerErrorException("Unexpected Redis or error");
+        }
+        // НУЖНО РАЗДЕЛИТЬ ТИПЫ ОШИБОК РЕДИСА И РЭББИТМК, СОЗДАТЬ ПРИВАТНЫЕ ФУНКЦИИ ДЛЯ ОТПРАВКИ
+        // СООБЩЕНИЙ В РЕДИС И РЭББИТ (ОТДЕЛЬНО), А ЗАТЕМ ИСПОЛЬЗОВАТЬ ИХ В generateAndSendOtp КАК ВСПОМОГАТЕЛЬНЫЕ
+    }
 }
