@@ -41,6 +41,11 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: USER
       RABBITMQ_DEFAULT_PASS: "123456"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
@@ -75,6 +80,17 @@ services:
     ports:
       - "4001:4001"
       - "51212:51212"
+
+
+  notification-service:
+    build: ./apps/notification-service
+    env_file: ./apps/notification-service/.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - base_network
+
 
 
 

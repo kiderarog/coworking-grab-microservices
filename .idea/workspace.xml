@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="daec9f72-db7f-4525-820e-9c3a25e7d6be" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/auth-service/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/auth-service/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/auth-service/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/src/app.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.service.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -19,27 +14,73 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dockerfile" />
+      </list>
+    </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/apps/notification-service" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="39IaZTsq6hRzh3Zj8ezgCxoGWt2" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "SHELLCHECK.PATH": "C:\\Users\\gosha\\AppData\\Roaming\\JetBrains\\WebStorm2025.2\\plugins\\Shell Script\\shellcheck.exe",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/coworking-grab-microservices/apps/auth-service/src/security",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "ts.external.directory.path": "C:\\coworking-grab-microservices\\apps\\api-gateway\\node_modules\\typescript\\lib"
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;C:\\Users\\gosha\\AppData\\Roaming\\JetBrains\\WebStorm2025.2\\plugins\\Shell Script\\shellcheck.exe&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/coworking-grab-microservices/apps/notification-service&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\coworking-grab-microservices\\apps\\notification-service\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\coworking-grab-microservices\apps\notification-service" />
+      <recent name="C:\coworking-grab-microservices\apps\api-gateway" />
+      <recent name="C:\coworking-grab-microservices\apps\auth-service" />
       <recent name="C:\coworking-grab-microservices\apps\auth-service\src\security" />
     </key>
   </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-WS-252.28238.10" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="daec9f72-db7f-4525-820e-9c3a25e7d6be" name="Changes" comment="" />
+      <created>1770386095474</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1770386095474</updated>
+      <workItem from="1770386096824" duration="15013000" />
+      <workItem from="1770435532382" duration="1183000" />
+    </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>
