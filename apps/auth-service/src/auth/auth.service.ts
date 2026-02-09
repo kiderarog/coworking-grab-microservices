@@ -190,9 +190,8 @@ export class AuthService {
 
     async generateAndSendOtp(userId: string) {
         const user = await prisma.user.findUnique({
-            where: {
-                id: userId,
-            }, select: {
+            where: {id: userId},
+            select: {
                 id: true,
                 name: true,
                 email: true,
@@ -205,26 +204,33 @@ export class AuthService {
         if (user.emailVerified) {
             throw new ConflictException("This user already has verified email");
         }
+        const otp = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
 
         try {
-            const otp = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
+            await this.sendOtpToRedis(user.email, otp);
+        } catch (err) {
+            throw new InternalServerErrorException("Failed to save OTP to Redis");
+        }
 
-            await this.redisService.getClient().set(
-                `otp:email:${user.email}`,
-                otp,
-                'EX',
-                300,
-            );
-
+        try {
             await this.messagingService.otpRequested({
                 userId,
                 otp,
                 email: user.email
             });
-        } catch (error) {
-            throw new InternalServerErrorException("Unexpected Redis or error");
+        } catch (err) {
+            throw new InternalServerErrorException("Failed to send OTP message to RabbitMQ");
         }
-        // НУЖНО РАЗДЕЛИТЬ ТИПЫ ОШИБОК РЕДИСА И РЭББИТМК, СОЗДАТЬ ПРИВАТНЫЕ ФУНКЦИИ ДЛЯ ОТПРАВКИ
-        // СООБЩЕНИЙ В РЕДИС И РЭББИТ (ОТДЕЛЬНО), А ЗАТЕМ ИСПОЛЬЗОВАТЬ ИХ В generateAndSendOtp КАК ВСПОМОГАТЕЛЬНЫЕ
     }
+
+
+    private async sendOtpToRedis(email: string, otp: string) {
+        await this.redisService.getClient().set(
+            `otp:email:${email}`,
+            otp,
+            'EX',
+            300,
+        );
+    }
+
 }
