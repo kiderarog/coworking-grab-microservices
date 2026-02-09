@@ -42,7 +42,7 @@ services:
       RABBITMQ_DEFAULT_USER: USER
       RABBITMQ_DEFAULT_PASS: "123456"
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -90,6 +90,20 @@ services:
         condition: service_healthy
     networks:
       - base_network
+
+
+  payment-service:
+    build: ./apps/payment-service-java
+    container_name: payment-service
+    env_file:
+      - ./apps/payment-service-java/.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - base_network
+    ports:
+      - "4003:4003"
 
 
 
