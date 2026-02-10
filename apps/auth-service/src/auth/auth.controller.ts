@@ -39,6 +39,15 @@ export class AuthController {
     @Post('request-email-verification')
     @Authorization()
     async requestEmailVerification(@Req() req: Request) {
-        return await this.authService.generateAndSendOtp((req.user as JwtPayload).id);
+        await this.authService.generateAndSendOtp((req.user as JwtPayload).id);
+        return {message: 'Verification code sent to your email'};
+
+    }
+
+    @Post('email-verifying')
+    @Authorization()
+    async emailVerifying(@Req() req: Request, @Body('otp') otp: string) {
+        await this.authService.verifyEmail((req.user as JwtPayload).id, otp);
+        return {message: 'Your email was successfully verified!'};
     }
 }

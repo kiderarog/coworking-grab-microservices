@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     ConflictException,
     Injectable,
     InternalServerErrorException,
@@ -231,6 +232,42 @@ export class AuthService {
             'EX',
             300,
         );
+    }
+
+    async verifyEmail(userId: string, otp: string) {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            }
+        });
+        if (!user) {
+            throw new NotFoundException("User not found");
+        }
+        if (user.emailVerified) {
+            throw new ConflictException("User email has already verified");
+        }
+
+        let otpFromRedis: string | null;
+        try {
+            otpFromRedis = await this.redisService.getClient().get(`otp:email:${user.email}`);
+        } catch (error) {
+            throw new InternalServerErrorException("Error while extracting OTP from Redis")
+        }
+
+        if (otpFromRedis === otp) {
+            await prisma.user.update({
+                where: {
+                    id: userId
+                }, data: {
+                    emailVerified: true
+                }
+            });
+            await this.redisService.getClient().del(`otp:email:${user.email}`);
+            return { message: "Email successfully verified" };
+        } else {
+            throw new BadRequestException("Invalid OTP-code.");
+        }
+
     }
 
 }
