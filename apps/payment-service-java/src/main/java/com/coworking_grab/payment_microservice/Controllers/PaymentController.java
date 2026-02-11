@@ -3,7 +3,9 @@ package com.coworking_grab.payment_microservice.Controllers;
 import com.coworking_grab.payment_microservice.Dto.PaymentDto;
 import com.coworking_grab.payment_microservice.Dto.WebhookPayload;
 
+import com.coworking_grab.payment_microservice.Security.JwtUtil;
 import com.coworking_grab.payment_microservice.Services.PaymentService;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +15,12 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public PaymentController(PaymentService paymentService) {
+    public PaymentController(PaymentService paymentService, JwtUtil jwtUtil) {
         this.paymentService = paymentService;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping("/success-page")
@@ -25,9 +29,16 @@ public class PaymentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createPayment(@RequestBody PaymentDto dto) {
-        String raw = paymentService.createPayment(dto.getAmount(), dto.getUserId());
-        return ResponseEntity.ok(raw);
+    public ResponseEntity<String> createPayment(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                                @RequestBody PaymentDto dto) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body("Invalid or missing Authorization header");
+        }
+        String token = authHeader.substring(7);
+        Claims claims = jwtUtil.parse(token);
+        String userId = claims.get("id", String.class);
+        return ResponseEntity.ok(paymentService.createPayment(dto.getAmount(), userId));
     }
 
     @PostMapping("/webhook")

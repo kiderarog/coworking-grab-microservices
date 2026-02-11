@@ -7,5 +7,4 @@ import java.math.BigDecimal;
 @Data
 public class PaymentDto {
     private BigDecimal amount;
-    private String userId;
 }

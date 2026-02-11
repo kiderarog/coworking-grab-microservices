@@ -12,3 +12,6 @@ server:
   port: 4003
 
 
+jwt:
+  secret-key: supersecretkeysupersecretkey123456
+
