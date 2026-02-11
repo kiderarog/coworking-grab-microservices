@@ -11,8 +11,4 @@ spring:
 server:
   port: 4003
 
-rabbitmq:
-  queue:
-    name: payment_queue
-
 

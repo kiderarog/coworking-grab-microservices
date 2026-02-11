@@ -1,11 +1,12 @@
 package com.coworking_grab.payment_microservice.Controllers;
 
+import com.coworking_grab.payment_microservice.Dto.PaymentDto;
+import com.coworking_grab.payment_microservice.Dto.WebhookPayload;
+
 import com.coworking_grab.payment_microservice.Services.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/payment")
@@ -24,20 +25,17 @@ public class PaymentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createPayment(
-            @RequestParam BigDecimal amount,
-            @RequestParam String userId
-    ) {
-        String raw = paymentService.createPayment(amount, userId);
+    public ResponseEntity<String> createPayment(@RequestBody PaymentDto dto) {
+        String raw = paymentService.createPayment(dto.getAmount(), dto.getUserId());
         return ResponseEntity.ok(raw);
     }
 
     @PostMapping("/webhook")
-    public ResponseEntity<String> handleWebhook(@RequestBody String body) {
-        System.out.println("WEBHOOK RECEIVED:");
-        System.out.println(body);
-        return ResponseEntity.ok("OK");
+    public ResponseEntity<String> handleWebhook(@RequestBody WebhookPayload webhookPayload) {
+        System.out.println("WEBHOOK RECEIVED" + webhookPayload);
+        return paymentService.receivePaymentWebhookAndSendToRabbitMQ(webhookPayload);
     }
+
 
 }
 
