@@ -19,6 +19,20 @@ services:
       timeout: 5s
       retries: 5
 
+  payment-db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: payment-service-db
+    ports:
+      - "5433:5432"
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+    networks:
+      - base_network
+
+
   redis:
     container_name: redis
     image: redis:6.2
@@ -113,6 +127,7 @@ volumes:
   auth_db_data:
   redis_data:
   rabbitmq_data:
+  payment_db_data:
 
 networks:
   base_network:

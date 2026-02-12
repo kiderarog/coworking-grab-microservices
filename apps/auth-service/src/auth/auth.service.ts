@@ -140,7 +140,6 @@ export class AuthService {
     async createUser(dto: CreateUserDto, res: Response) {
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(dto.password, salt);
-
         try {
             const user = await prisma.user.create({
                 data: {
@@ -160,7 +159,11 @@ export class AuthService {
                     role: true,
                     emailVerified: true,
                 },
+
             });
+            this.messagingService.addUserRequestToPayment(user.id)
+                .catch(err => console.error("RabbitMQ error:", err));
+
 
             const {accessToken, refreshToken} = this.generateTokens(
                 user.id,
@@ -263,7 +266,7 @@ export class AuthService {
                 }
             });
             await this.redisService.getClient().del(`otp:email:${user.email}`);
-            return { message: "Email successfully verified" };
+            return {message: "Email successfully verified"};
         } else {
             throw new BadRequestException("Invalid OTP-code.");
         }

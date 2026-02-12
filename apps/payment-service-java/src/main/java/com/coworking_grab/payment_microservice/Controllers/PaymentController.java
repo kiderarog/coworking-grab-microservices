@@ -6,7 +6,6 @@ import com.coworking_grab.payment_microservice.Dto.WebhookPayload;
 import com.coworking_grab.payment_microservice.Security.JwtUtil;
 import com.coworking_grab.payment_microservice.Services.PaymentService;
 import io.jsonwebtoken.Claims;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,16 +16,18 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final JwtUtil jwtUtil;
 
-    @Autowired
+
     public PaymentController(PaymentService paymentService, JwtUtil jwtUtil) {
         this.paymentService = paymentService;
         this.jwtUtil = jwtUtil;
     }
 
+
     @GetMapping("/success-page")
     public String successPayment() {
         return "SUCCESS PAYMENT";
     }
+
 
     @PostMapping("/create")
     public ResponseEntity<String> createPayment(@RequestHeader(value = "Authorization", required = false) String authHeader,
@@ -45,6 +46,7 @@ public class PaymentController {
     public ResponseEntity<String> handleWebhook(@RequestBody WebhookPayload webhookPayload) {
         System.out.println("WEBHOOK RECEIVED" + webhookPayload);
         return paymentService.receivePaymentWebhookAndSendToRabbitMQ(webhookPayload);
+        // Нужно добавить логику увеличения баланса (после создания метода в сервисе)
     }
 
 

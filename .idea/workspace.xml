@@ -6,8 +6,15 @@
   <component name="ChangeListManager">
     <list default="true" id="daec9f72-db7f-4525-820e-9c3a25e7d6be" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/auth-service/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/prisma/schema.prisma" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/src/auth/auth.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/auth-service/src/messaging/messaging.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/src/messaging/messaging.module.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/auth-service/src/messaging/messaging.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/auth-service/src/messaging/messaging.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/payment-service-java/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/apps/payment-service-java/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/payment-service-java/src/main/java/com/coworking_grab/payment_microservice/Config/RabbitConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/apps/payment-service-java/src/main/java/com/coworking_grab/payment_microservice/Config/RabbitConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/payment-service-java/src/main/java/com/coworking_grab/payment_microservice/Controllers/PaymentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/apps/payment-service-java/src/main/java/com/coworking_grab/payment_microservice/Controllers/PaymentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/payment-service-java/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/apps/payment-service-java/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,7 +29,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/apps/notification-service" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
@@ -39,6 +46,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "SHELLCHECK.PATH": "C:\\Users\\gosha\\AppData\\Roaming\\JetBrains\\WebStorm2025.2\\plugins\\Shell Script\\shellcheck.exe",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "main",
@@ -77,6 +85,7 @@
       <updated>1770386095474</updated>
       <workItem from="1770386096824" duration="15013000" />
       <workItem from="1770435532382" duration="19350000" />
+      <workItem from="1770900568602" duration="1808000" />
     </task>
     <servers />
   </component>

@@ -4,10 +4,17 @@ import {OtpRabbitmqSendingDto} from "./dto/otp-rabbitmq-sending.dto";
 
 @Injectable()
 export class MessagingService {
-    public constructor(@ Inject('NOTIFICATIONS_CLIENT') private readonly client: ClientProxy) {
+    public constructor(@Inject('NOTIFICATIONS_CLIENT')
+                       private readonly notificationsClient: ClientProxy,
+                       @Inject('USER_CREATED_CLIENT')
+                       private readonly userCreatedClient: ClientProxy,) {
     }
 
     public async otpRequested(data: OtpRabbitmqSendingDto) {
-        return this.client.emit('auth.otp.requested', data)
+        return this.notificationsClient.emit('auth.otp.requested', data);
+    }
+
+    public async addUserRequestToPayment(userId: String) {
+        this.userCreatedClient.emit('add.user.request', {userId: userId});
     }
 }

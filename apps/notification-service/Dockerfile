@@ -22,4 +22,4 @@ RUN npm install --omit=dev
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 4002
-CMD ["sh", "-c", "sleep 30 && node dist/main.js"]
+CMD ["sh", "-c", "sleep 15 && node dist/main.js"]

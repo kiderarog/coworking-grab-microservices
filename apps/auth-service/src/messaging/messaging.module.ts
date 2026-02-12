@@ -16,9 +16,23 @@ import {ClientsModule, Transport} from "@nestjs/microservices";
                 }
             }
         })
+    }, {
+        name: 'USER_CREATED_CLIENT',
+        useFactory: () => ({
+                transport: Transport.RMQ,
+                options: {
+                    urls: ['amqp://USER:123456@rabbitmq:5672'],
+                    queue: 'user_created_queue',
+                    queueOptions: {
+                        durable: true
+                    }
+                }
+            }
+        )
     }])],
     providers: [MessagingService],
     exports: [MessagingService]
 })
 
-export class MessagingModule {}
+export class MessagingModule {
+}
