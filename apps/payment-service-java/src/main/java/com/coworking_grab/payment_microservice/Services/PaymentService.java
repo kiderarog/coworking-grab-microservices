@@ -1,13 +1,16 @@
 package com.coworking_grab.payment_microservice.Services;
 
 import com.coworking_grab.payment_microservice.Dto.CreatePaymentRequest;
+import com.coworking_grab.payment_microservice.Dto.ResponseDTO;
 import com.coworking_grab.payment_microservice.Dto.WebhookPayload;
 import com.coworking_grab.payment_microservice.Events.PaymentCreatedEvent;
 import com.coworking_grab.payment_microservice.Exceptions.RabbitMessageSendException;
+import com.coworking_grab.payment_microservice.Security.JwtUtil;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
@@ -25,28 +28,53 @@ public class PaymentService {
 
     private final PaymentProducer paymentProducer;
     private final ObjectMapper objectMapper;
+    private final BalanceService balanceService;
+    private final JwtUtil jwtUtil;
+    private final RestClient restClient;
 
-    public PaymentService(PaymentProducer paymentProducer, ObjectMapper objectMapper) {
+
+    public PaymentService(PaymentProducer paymentProducer, ObjectMapper objectMapper,
+                          BalanceService balanceService, JwtUtil jwtUtil,
+                          RestClient restClient) {
         this.paymentProducer = paymentProducer;
         this.objectMapper = objectMapper;
+        this.balanceService = balanceService;
+        this.jwtUtil = jwtUtil;
+        this.restClient = restClient;
     }
 
-    public String createPayment(BigDecimal amount, String userId) {
+    public ResponseDTO createPayment(BigDecimal amount, String authHeader) {
 
         System.out.println("SHOP ID = " + shopId);
         System.out.println("SECRET = " + secretKey);
 
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return new ResponseDTO("error", "Invalid or missing Authorization header");
+        }
 
-        CreatePaymentRequest req = getCreatePaymentRequest(amount, userId);
+        try {
+            String token = authHeader.substring(7);
+            Claims claims = jwtUtil.parse(token);
+            String userId = claims.get("id", String.class);
 
-        String auth = shopId + ":" + secretKey;
-        String basicAuth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
+            CreatePaymentRequest req = getCreatePaymentRequest(amount, userId);
 
-        WebClient webClient = WebClient.builder().baseUrl("https://api.yookassa.ru/v3").defaultHeader("Authorization", basicAuth).defaultHeader("Content-Type", "application/json").build();
+            String auth = shopId + ":" + secretKey;
+            String basicAuth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
 
-        String raw = webClient.post().uri("/payments").header("Idempotence-Key", UUID.randomUUID().toString()).bodyValue(req).retrieve().bodyToMono(String.class).block();
-        System.out.println(raw);
-        return raw;
+            String raw = restClient.post().uri("/payments")
+                    .header("Authorization", basicAuth)
+                    .header("Idempotence-Key", UUID.randomUUID().toString())
+                    .body(req).retrieve().body(String.class);
+            Object json = objectMapper.readValue(raw, Object.class);
+            ResponseDTO response = new ResponseDTO("success", "Payment created");
+            response.setData(json);
+            response.setTimestamp(System.currentTimeMillis());
+            return response;
+        } catch (Exception e) {
+            return new ResponseDTO("error", "Error while creating a payment: " + e.getMessage());
+        }
+
     }
 
     private static CreatePaymentRequest getCreatePaymentRequest(BigDecimal amount, String userId) {
@@ -75,9 +103,14 @@ public class PaymentService {
         return req;
     }
 
-    public ResponseEntity<String> receivePaymentWebhookAndSendToRabbitMQ(WebhookPayload webhookPayload) {
+    public ResponseEntity<String> topUpBalanceAndSendEvent(WebhookPayload webhookPayload) {
         PaymentCreatedEvent event = getPaymentCreatedEvent(webhookPayload);
         String eventToJson = objectMapper.writeValueAsString(event);
+        if (!event.getStatus().equals("succeeded" +
+                "")) {
+            return ResponseEntity.status(400).body("Payment status is UNSUCCESSFUL");
+        }
+        balanceService.topUpBalance(UUID.fromString(event.getUserId()), event.getAmount());
         try {
             paymentProducer.sendPaymentCreatedEvent(eventToJson);
             System.out.println("PaymentCreatedEvent sent to RabbitMQ: " + event);
