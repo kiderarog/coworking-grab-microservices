@@ -56,8 +56,9 @@ public class PaymentService {
             String token = authHeader.substring(7);
             Claims claims = jwtUtil.parse(token);
             String userId = claims.get("id", String.class);
+            String userEmail = claims.get("email", String.class);
 
-            CreatePaymentRequest req = getCreatePaymentRequest(amount, userId);
+            CreatePaymentRequest req = getCreatePaymentRequest(amount, userId, userEmail);
 
             String auth = shopId + ":" + secretKey;
             String basicAuth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
@@ -77,7 +78,7 @@ public class PaymentService {
 
     }
 
-    private static CreatePaymentRequest getCreatePaymentRequest(BigDecimal amount, String userId) {
+    private static CreatePaymentRequest getCreatePaymentRequest(BigDecimal amount, String userId, String userEmail) {
         CreatePaymentRequest req = new CreatePaymentRequest();
 
         CreatePaymentRequest.Amount amt = new CreatePaymentRequest.Amount();
@@ -93,6 +94,7 @@ public class PaymentService {
 
         CreatePaymentRequest.Metadata metadata = new CreatePaymentRequest.Metadata();
         metadata.setUserId(userId);
+        metadata.setUserEmail(userEmail);
 
         req.setAmount(amt);
         req.setPayment_method_data(pmd);
@@ -103,23 +105,27 @@ public class PaymentService {
         return req;
     }
 
-    public ResponseEntity<String> topUpBalanceAndSendEvent(WebhookPayload webhookPayload) {
+    public ResponseEntity<ResponseDTO> topUpBalanceAndSendEvent(WebhookPayload webhookPayload) {
         PaymentCreatedEvent event = getPaymentCreatedEvent(webhookPayload);
-        String eventToJson = objectMapper.writeValueAsString(event);
-        if (!event.getStatus().equals("succeeded" +
-                "")) {
-            return ResponseEntity.status(400).body("Payment status is UNSUCCESSFUL");
+        if (!"succeeded".equals(event.getStatus())) {
+            ResponseDTO response = new ResponseDTO("error", "Payment status is UNSUCCESSFUL");
+            response.setTimestamp(System.currentTimeMillis());
+            return ResponseEntity.badRequest().body(response);
         }
         balanceService.topUpBalance(UUID.fromString(event.getUserId()), event.getAmount());
         try {
-            paymentProducer.sendPaymentCreatedEvent(eventToJson);
+            paymentProducer.sendPaymentCreatedEvent(event);
             System.out.println("PaymentCreatedEvent sent to RabbitMQ: " + event);
 
         } catch (Exception e) {
             throw new RabbitMessageSendException("Error while sending message to RabbitMQ", e);
         }
 
-        return ResponseEntity.ok("Webhook processed");
+        ResponseDTO response = new ResponseDTO("success", "Webhook processed successfully");
+        response.setTimestamp(System.currentTimeMillis());
+        response.setData(event);
+        return ResponseEntity.ok(response);
+
     }
 
     private static PaymentCreatedEvent getPaymentCreatedEvent(WebhookPayload webhookPayload) {
@@ -128,7 +134,8 @@ public class PaymentService {
                     webhookPayload.getObject().getId(),
                     new BigDecimal(webhookPayload.getObject().getAmount().getValue()),
                     webhookPayload.getObject().getStatus(),
-                    webhookPayload.getObject().getMetadata().getUserId()
+                    webhookPayload.getObject().getMetadata().getUserId(),
+                    webhookPayload.getObject().getMetadata().getUserEmail()
             );
         } catch (Exception e) {
             throw new RuntimeException("Error while parsing webhook data", e);

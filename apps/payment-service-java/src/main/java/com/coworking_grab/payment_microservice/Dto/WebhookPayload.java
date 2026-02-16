@@ -32,6 +32,7 @@ public class WebhookPayload {
     @Data
     public static class Metadata {
         private String userId;
+        private String userEmail;
     }
 }
 

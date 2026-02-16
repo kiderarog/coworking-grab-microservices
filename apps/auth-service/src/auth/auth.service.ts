@@ -43,11 +43,12 @@ export class AuthService {
 
     private generateTokens(
         id: string,
+        email: string,
         role: Role,
         bookedSpotId: string | null,
-        emailVerified: boolean,
+        emailVerified: boolean
     ) {
-        const payLoad = {id, role, bookedSpotId, emailVerified};
+        const payLoad = {id, email, role, bookedSpotId, emailVerified};
 
         const accessToken = this.jwtService.sign(payLoad, {
             expiresIn: this.JWT_ACCESS_TOKEN_TTL,
@@ -88,6 +89,7 @@ export class AuthService {
 
         const {accessToken, refreshToken} = this.generateTokens(
             logUser.id,
+            logUser.email,
             logUser.role,
             logUser.bookedSpotId,
             logUser.emailVerified,
@@ -114,6 +116,7 @@ export class AuthService {
             },
             select: {
                 id: true,
+                email: true,
                 role: true,
                 bookedSpotId: true,
                 emailVerified: true,
@@ -125,6 +128,7 @@ export class AuthService {
         }
         const {accessToken} = this.generateTokens(
             user.id,
+            user.email,
             user.role,
             user.bookedSpotId,
             user.emailVerified,
@@ -167,6 +171,7 @@ export class AuthService {
 
             const {accessToken, refreshToken} = this.generateTokens(
                 user.id,
+                user.email,
                 user.role,
                 user.bookedSpotId,
                 user.emailVerified,

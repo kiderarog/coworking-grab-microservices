@@ -10,13 +10,15 @@ public class PaymentCreatedEvent {
     private BigDecimal amount;
     private String status;
     private String userId;
+    private String userEmail;
 
     public PaymentCreatedEvent(String paymentId, BigDecimal amount,
-                               String status, String userId) {
+                               String status, String userId, String userEmail) {
         this.paymentId = paymentId;
         this.amount = amount;
         this.status = status;
         this.userId = userId;
+        this.userEmail = userEmail;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.coworking_grab.payment_microservice.Config;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,6 +16,13 @@ public class RabbitConfig {
     public static final String USER_CREATED_QUEUE = "user_created_queue";
     private static final String USER_EXCHANGE = "user.exchange";
     public static final String USER_ROUTING_KEY = "add.user.request";
+
+
+    // Парсер для нормальной обработки в несте
+    @Bean
+    public JacksonJsonMessageConverter messageConverter() {
+        return new JacksonJsonMessageConverter();
+    }
 
 
     @Bean

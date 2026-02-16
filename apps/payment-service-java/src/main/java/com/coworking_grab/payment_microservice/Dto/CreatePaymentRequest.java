@@ -31,5 +31,6 @@ public class CreatePaymentRequest {
     @Data
     public static class Metadata {
         private String userId;
+        private String userEmail;
     }
 }

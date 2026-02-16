@@ -41,7 +41,7 @@ public class PaymentController {
 
 
     @PostMapping("/webhook")
-    public ResponseEntity<String> handleWebhook(@RequestBody WebhookPayload webhookPayload) {
+    public ResponseEntity<ResponseDTO> handleWebhook(@RequestBody WebhookPayload webhookPayload) {
         System.out.println("WEBHOOK RECEIVED" + webhookPayload);
         return paymentService.topUpBalanceAndSendEvent(webhookPayload);
     }
