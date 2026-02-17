@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+yarn-error.log
+dist
+build
+.next
+Dockerfile
+.dockerignore
+.vscode
+.idea

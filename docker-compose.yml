@@ -32,6 +32,19 @@ services:
     networks:
       - base_network
 
+  coworking-db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: coworking-db
+    ports:
+      - "5434:5432"
+    volumes:
+      - coworking_db_data:/var/lib/postgresql/data
+    networks:
+      - base_network
+
 
   redis:
     container_name: redis
@@ -120,6 +133,22 @@ services:
       - "4003:4003"
 
 
+  back-office:
+    build: ./apps/back-office
+    env_file: ./apps/back-office/.env
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@coworking-db:5432/coworking-db?schema=public"
+    depends_on:
+      coworking-db:
+        condition: service_started
+    networks:
+      - base_network
+    ports:
+      - "4004:4004"
+      - "51213:51213"
+
+
+
 
 
 
@@ -128,6 +157,7 @@ volumes:
   redis_data:
   rabbitmq_data:
   payment_db_data:
+  coworking_db_data:
 
 networks:
   base_network:

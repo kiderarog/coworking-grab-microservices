@@ -1,13 +1,13 @@
 #!/bin/bash
 echo "Waiting for database connection..."
-while ! nc -z db 5432; do
+while ! nc -z coworking-db 5432; do
   sleep 1
 done
-echo "auth-service-Database is up! Syncing schema with db push..."
+echo "Coworking-Database is up! Syncing schema with db push..."
 env | grep DATABASE_URL
 echo "Using DATABASE_URL=$DATABASE_URL"
 export DATABASE_URL="$DATABASE_URL"
 npx prisma db push
-npx prisma studio --port 51212 --browser none &
+npx prisma studio --port 51213 --browser none &
 echo "Schema synced. Starting NestJS..."
 exec node dist/src/main.js
