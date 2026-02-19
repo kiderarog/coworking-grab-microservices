@@ -1,11 +1,10 @@
 import {Injectable} from "@nestjs/common";
-import {prisma} from '../../../prisma';
 
 
 @Injectable()
 export class SpotRepository {
 
-    async addSpots(data: { coworking_id: string; amount_of_spots: number }) {
+    async addSpots(transaction: any, data: { coworking_id: string; amount_of_spots: number }) {
         const spots: any[] = [];
         for (let i = 0; i < data.amount_of_spots; i++) {
             spots.push({
@@ -14,7 +13,7 @@ export class SpotRepository {
                 status: 'FREE',
             });
         }
-        await prisma.spot.createMany({
+        await transaction.spot.createMany({
             data: spots,
         });
     }
