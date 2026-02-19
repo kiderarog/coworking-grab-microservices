@@ -10,13 +10,22 @@ export class CoworkingController {
     }
 
     @Get()
+    @Authorization()
     async getAllCoworkingSpaces() {
         return this.coworkingService.getCoworkingsList();
     }
 
     @Get(':id')
+    @Authorization()
     async getCoworking(@Param('id') id: string) {
         return this.coworkingService.getCoworking(id);
+    }
+
+    // Операционная информация для проверки возможности бронирования (isFrozen, availableSpots на клиент)
+    @Get(':id/is-available')
+    @Authorization()
+    async isAvailableForBooking(@Param('id') coworkingId: string){
+        return this.coworkingService.getCoworkingInfoForBookingOperation(coworkingId);
     }
 
     @Post()
@@ -39,5 +48,6 @@ export class CoworkingController {
     async changeFreezeStatus(@Param('id') id: string) {
         return this.coworkingService.updateFreezeStatus(id);
     }
+
 
 }

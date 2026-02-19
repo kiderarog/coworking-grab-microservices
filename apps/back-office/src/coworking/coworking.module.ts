@@ -8,17 +8,20 @@ import {getJwtConfig, RolesGuard} from "../security";
 import {CoworkingRepository} from "./infrastructure/repositories/coworking.repository";
 import {SpotModule} from "../spot/spot.module";
 import {JwtStrategy} from "../security/strategies/jwt.strategy";
+import { forwardRef } from "@nestjs/common";
+
 
 @Module({
     imports: [
         JwtModule.registerAsync({
-            imports: [ConfigModule, PassportModule],
+            imports: [ConfigModule, PassportModule, forwardRef(() => SpotModule)],
             useFactory: getJwtConfig,
             inject: [ConfigService],
         })
         , SpotModule,],
     controllers: [CoworkingController],
     providers: [CoworkingService, CoworkingRepository, JwtStrategy, RolesGuard],
+    exports: [CoworkingRepository]
 })
 export class CoworkingModule {
 }

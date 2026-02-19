@@ -4,6 +4,7 @@ import {SpotRepository} from "../spot/infrastructure/repositories/spot.repositor
 import {AddCoworkingDto} from "./dto/add-coworking-dto";
 import {UpdateCoworkingDto} from "./dto/update-coworking-dto";
 import {prisma} from "../prisma";
+import {CoworkingInfoDto} from "./dto/coworking-info.dto";
 
 
 @Injectable()
@@ -94,6 +95,27 @@ export class CoworkingService {
             throw new InternalServerErrorException("Error while getting coworking by ID");
         }
     }
+
+    async getCoworkingInfoForBookingOperation(coworkingId: string) {
+        if (!coworkingId) {
+            throw new BadRequestException("Coworking ID is required to make info request");
+        }
+
+        const coworking = await this.coworkingRepository.getCoworkingInfoForBookingSpot(coworkingId);
+        if (!coworking) {
+            throw new NotFoundException("Coworking not found");
+        }
+
+        const totalSpots = await this.spotRepository.countTotalSpots(coworkingId);
+        const availableSpots = await this.spotRepository.countAvailableSpots(coworkingId);
+        return new CoworkingInfoDto(
+            coworking.id,
+            coworking.isFrozen,
+            totalSpots,
+            availableSpots
+        );
+    }
+
 }
 
 // ПРИЗМА:

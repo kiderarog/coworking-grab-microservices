@@ -45,4 +45,14 @@ export class CoworkingRepository {
     async findAllCoworkingSpaces() {
         return prisma.coworking.findMany();
     }
+
+    async getCoworkingInfoForBookingSpot(coworkingId: string) {
+        return prisma.coworking.findUnique({
+            where: {
+                id: coworkingId
+            }, select: { id: true, isFrozen: true}
+        })
+    }
+
+
 }
