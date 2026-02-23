@@ -45,6 +45,19 @@ services:
     networks:
       - base_network
 
+  booking-db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: booking-db
+    ports:
+      - "5435:5432"
+    volumes:
+      - booking_db_data:/var/lib/postgresql/data
+    networks:
+      - base_network
+
 
   redis:
     container_name: redis
@@ -147,10 +160,19 @@ services:
       - "4004:4004"
       - "51213:51213"
 
-
-
-
-
+  booking-service:
+    build: ./apps/booking-service
+    env_file: ./apps/booking-service/.env
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@booking-db:5432/booking-db?schema=public"
+    depends_on:
+      booking-db:
+        condition: service_started
+    networks:
+      - base_network
+    ports:
+      - "4005:4005"
+      - "51214:51214"
 
 volumes:
   auth_db_data:
@@ -158,6 +180,7 @@ volumes:
   rabbitmq_data:
   payment_db_data:
   coworking_db_data:
+  booking_db_data:
 
 networks:
   base_network:

@@ -1,0 +1,28 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Booking {
+  id              String        @id @default(uuid()) @db.Uuid
+  coworking_id    String        @db.Uuid
+  user_id         String        @db.Uuid
+  start_time      DateTime
+  end_time        DateTime
+  amount_of_money Decimal       @db.Decimal(10, 2)
+  status          BookingStatus
+  created_at      DateTime      @default(now())
+  expires_at      DateTime?
+}
+
+enum BookingStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  EXPIRED
+}
