@@ -139,7 +139,6 @@ export class AuthController {
 
 
     @Post('email-verification/verify')
-
     async verifyEmail(@Req() req: Request, @Res() res: Response, @Body('otp') otp: string) {
         try {
             const response = await axios.post(

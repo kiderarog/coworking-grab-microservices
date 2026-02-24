@@ -6,6 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="daec9f72-db7f-4525-820e-9c3a25e7d6be" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api-gateway/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api-gateway/src/app.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api-gateway/src/auth/auth.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api-gateway/src/auth/auth.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api-gateway/src/payment/dto/create-payment-dto.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api-gateway/src/payment/payment.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api-gateway/src/payment/payment.controller.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,7 +24,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/apps/booking-service" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
@@ -80,7 +84,7 @@
       <workItem from="1770900568602" duration="13337000" />
       <workItem from="1771240144116" duration="16443000" />
       <workItem from="1771412360762" duration="34694000" />
-      <workItem from="1771568542872" duration="18307000" />
+      <workItem from="1771568542872" duration="31785000" />
     </task>
     <servers />
   </component>

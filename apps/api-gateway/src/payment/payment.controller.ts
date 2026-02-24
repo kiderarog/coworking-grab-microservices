@@ -2,7 +2,6 @@ import {Body, Controller, Get, Post, Req, Res} from "@nestjs/common";
 import {ConfigService} from "@nestjs/config";
 import type {Request, Response} from 'express';
 import axios from "axios";
-import {CreatePaymentDto} from "./dto/create-payment-dto";
 
 @Controller('payment')
 export class PaymentController {
@@ -13,7 +12,7 @@ export class PaymentController {
     }
 
     @Post('create')
-    async createPayment(@Req() req: Request, @Res() res: Response, @Body() body: CreatePaymentDto) {
+    async createPayment(@Req() req: Request, @Res() res: Response, @Body() body: unknown) {
         try {
             const response = await axios.post(
                 `${this.PAYMENT_SERVICE_URL}/payment/create`,
