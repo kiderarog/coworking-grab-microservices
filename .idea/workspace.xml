@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="daec9f72-db7f-4525-820e-9c3a25e7d6be" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,9 +40,9 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHELLCHECK.PATH": "C:\\Users\\gosha\\AppData\\Roaming\\JetBrains\\WebStorm2025.2\\plugins\\Shell Script\\shellcheck.exe",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/coworking-grab-microservices/apps/booking-service",
+    "last_opened_file_path": "C:/coworking-grab-microservices/apps/booking-service/src",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
@@ -56,11 +54,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\coworking-grab-microservices\apps\booking-service\src" />
       <recent name="C:\coworking-grab-microservices\apps\booking-service" />
       <recent name="C:\coworking-grab-microservices\apps\notification-service" />
       <recent name="C:\coworking-grab-microservices\apps\api-gateway" />
       <recent name="C:\coworking-grab-microservices\apps\auth-service" />
-      <recent name="C:\coworking-grab-microservices\apps\auth-service\src\security" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -82,7 +80,7 @@
       <workItem from="1770900568602" duration="13337000" />
       <workItem from="1771240144116" duration="16443000" />
       <workItem from="1771412360762" duration="34694000" />
-      <workItem from="1771568542872" duration="14560000" />
+      <workItem from="1771568542872" duration="18307000" />
     </task>
     <servers />
   </component>
