@@ -50,7 +50,7 @@ export class CoworkingRepository {
         return prisma.coworking.findUnique({
             where: {
                 id: coworkingId
-            }, select: { id: true, isFrozen: true}
+            }, select: { id: true, isFrozen: true, price_for_day: true, price_for_month: true}
         })
     }
 

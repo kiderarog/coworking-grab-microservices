@@ -7,13 +7,24 @@ import {JwtModule} from "@nestjs/jwt";
 import {PassportModule} from "@nestjs/passport";
 import {JwtStrategy} from "../security/strategies/jwt.strategy";
 import {BookingRepository} from "./infrastructure/repositories/booking.repository";
+import {ClientsModule, Transport} from "@nestjs/microservices";
 
 @Module({
     imports: [PassportModule, JwtModule.registerAsync({
         imports: [ConfigModule],
         useFactory: getJwtConfig,
         inject: [ConfigService],
-    }),],
+    }), ClientsModule.registerAsync([{
+        name: 'BOOKING_CLIENT',
+        useFactory: () => ({
+            transport: Transport.RMQ,
+            options: {
+                urls: ['amqp://USER:123456@rabbitmq:5672'],
+                queue: 'booking_initialization_queue',
+                queueOptions: {durable: true},
+            },
+        }),
+    },]),],
     controllers: [BookingController],
     providers: [BookingService, JwtStrategy, RolesGuard, BookingRepository],
     exports: [BookingRepository]

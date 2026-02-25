@@ -112,7 +112,9 @@ export class CoworkingService {
             coworking.id,
             coworking.isFrozen,
             totalSpots,
-            availableSpots
+            availableSpots,
+            coworking.price_for_day.toNumber(),
+            coworking.price_for_month.toNumber()
         );
     }
 

@@ -1,8 +1,9 @@
-import {Body, Controller, Get, Param, Patch, Post} from '@nestjs/common';
+import {Body, Controller, Get, Param, Patch, Post, UseGuards} from '@nestjs/common';
 import {CoworkingService} from './coworking.service';
 import {Authorization, Roles} from "../security";
 import {AddCoworkingDto} from "./dto/add-coworking-dto";
 import {UpdateCoworkingDto} from "./dto/update-coworking-dto";
+import {InternalGuard} from "../security/guards/internal.guard";
 
 @Controller('coworkings')
 export class CoworkingController {
@@ -23,7 +24,7 @@ export class CoworkingController {
 
     // Операционная информация для проверки возможности бронирования (isFrozen, availableSpots на клиент)
     @Get(':id/is-available')
-    @Authorization()
+    @UseGuards(InternalGuard)
     async isAvailableForBooking(@Param('id') coworkingId: string){
         return this.coworkingService.getCoworkingInfoForBookingOperation(coworkingId);
     }

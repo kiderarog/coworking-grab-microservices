@@ -1,11 +1,10 @@
-export class CoworkingInfoDto {
+export class CoworkingInternalDataDto {
     coworkingId: string;
     isFrozen: boolean;
     totalSpots: number;
     availableSpots: number;
     priceForDay: number;
     priceForMonth: number;
-
 
 
     constructor(coworkingId: string, isFrozen: boolean, totalSpots: number, availableSpots: number, priceForDay: number, priceForMonth: number) {
@@ -15,6 +14,5 @@ export class CoworkingInfoDto {
         this.availableSpots = availableSpots;
         this.priceForDay = priceForDay;
         this.priceForMonth = priceForMonth;
-
     }
 }

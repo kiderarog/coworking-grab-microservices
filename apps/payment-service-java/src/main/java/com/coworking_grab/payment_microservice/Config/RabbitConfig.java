@@ -17,6 +17,11 @@ public class RabbitConfig {
     private static final String USER_EXCHANGE = "user.exchange";
     public static final String USER_ROUTING_KEY = "add.user.request";
 
+    public static final String BOOKING_INITIALIZATION_QUEUE = "booking_initialization_queue";
+
+
+
+
 
     // Парсер для нормальной обработки в несте
     @Bean
@@ -59,6 +64,11 @@ public class RabbitConfig {
                 .bind(userCreatedQueue())
                 .to(userExchange())
                 .with(USER_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue bookingInitializationQueue() {
+        return new Queue(BOOKING_INITIALIZATION_QUEUE, true);
     }
 
 
