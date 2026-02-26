@@ -154,6 +154,8 @@ services:
     depends_on:
       coworking-db:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - base_network
     ports:

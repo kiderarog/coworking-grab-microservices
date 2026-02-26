@@ -33,10 +33,12 @@ export class SpotService {
         }
     }
 
+
     async bookSpot(coworkingId: string) {
         if (!coworkingId) {
             throw new BadRequestException("Coworking ID is required to get the spots");
         }
+
         const coworking = await this.coworkingRepository.findCoworkingById(coworkingId);
         if (!coworking) {
             throw new NotFoundException("No such coworking");

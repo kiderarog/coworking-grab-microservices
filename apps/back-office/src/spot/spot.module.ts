@@ -8,7 +8,7 @@ import { CoworkingModule } from "../coworking/coworking.module";
     imports: [forwardRef(() => CoworkingModule)],
     controllers: [SpotController],
     providers: [SpotService, SpotRepository],
-    exports: [SpotRepository]
+    exports: [SpotRepository, SpotService]
 })
 export class SpotModule {
 }

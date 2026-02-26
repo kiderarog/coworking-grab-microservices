@@ -6,8 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="daec9f72-db7f-4525-820e-9c3a25e7d6be" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/payment-service-java/src/main/java/com/coworking_grab/payment_microservice/Config/RabbitConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/apps/payment-service-java/src/main/java/com/coworking_grab/payment_microservice/Config/RabbitConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/payment-service-java/src/main/java/com/coworking_grab/payment_microservice/Services/AddUserListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/apps/payment-service-java/src/main/java/com/coworking_grab/payment_microservice/Services/AddUserListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,6 +61,9 @@
       <recent name="C:\coworking-grab-microservices\apps\api-gateway" />
       <recent name="C:\coworking-grab-microservices\apps\auth-service" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\coworking-grab-microservices\apps\back-office\src\rabbitmq\dto" />
+    </key>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -84,7 +86,7 @@
       <workItem from="1771412360762" duration="34694000" />
       <workItem from="1771568542872" duration="32999000" />
       <workItem from="1772006581358" duration="2365000" />
-      <workItem from="1772009951478" duration="21661000" />
+      <workItem from="1772009951478" duration="35024000" />
     </task>
     <servers />
   </component>

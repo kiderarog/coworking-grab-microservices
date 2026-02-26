@@ -4,11 +4,12 @@ import { AppService } from './app.service';
 import {ConfigModule} from "@nestjs/config";
 import { CoworkingModule } from './coworking/coworking.module';
 import { SpotModule } from './spot/spot.module';
+import {RmqModule} from "./rabbitmq/rmq.module";
 
 @Module({
   imports: [ConfigModule.forRoot({
       isGlobal: true,
-  }), CoworkingModule, SpotModule],
+  }), CoworkingModule, SpotModule, RmqModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -25,7 +25,9 @@ export class BookingService {
 
     constructor(bookingRepository: BookingRepository, private readonly configService: ConfigService,
                 @Inject('BOOKING_CLIENT')
-                private readonly bookingClient: ClientProxy) {
+                private readonly bookingClient: ClientProxy,
+                @Inject('BOOKING_ACTIVE_EVENT')
+                private readonly activeBookingClient: ClientProxy) {
         this.bookingRepository = bookingRepository;
         this.BACK_OFFICE_SERVICE_URL = configService.getOrThrow('BACK_OFFICE_SERVICE_URL');
         this.INTERNAL_API_KEY = configService.getOrThrow('INTERNAL_API_KEY');
@@ -33,6 +35,11 @@ export class BookingService {
     }
 
     async createBooking(coworkingId: string, userId: string, dto: CreateBookingDto) {
+        console.log('createBooking called', {
+            coworkingId,
+            userId,
+            time: new Date().toISOString()
+        });
         const existingBooking = await this.bookingRepository.checkExistingBooking(
             {
                 coworkingId, userId
@@ -91,12 +98,21 @@ export class BookingService {
                 amount: bookingData.amount_of_money
             })
         );
-        console.log("СОБЫТИЕ О БРОНИРОВАНИИ ОТПРАВЛЕНО В PAYMENT SERVICE")
+        console.log("СОБЫТИЕ О БРОНИРОВАНИИ ОТПРАВЛЕНО В PAYMENT SERVICE");
         if (paymentResponse.status !== 'success') {
             throw new ConflictException("Failed while money writing-off attempt:" + paymentResponse.error);
         }
 
         await this.bookingRepository.changeBookingStatus(booking.id, BookingStatus.ACTIVE);
-        console.log("СТАТУС БРОНИРОВАНИЯ ИЗМЕНЕН НА ACTIVE")
+        console.log("СТАТУС БРОНИРОВАНИЯ ИЗМЕНЕН НА ACTIVE");
+
+        this.activeBookingClient.emit('booking.active', {
+            coworkingId
+        });
+    }
+
+    async checkingBookingStatus() {
+        const now = new Date(0);
+        
     }
 }
