@@ -72,5 +72,25 @@ export class BookingRepository {
         })
     }
 
+    async getBooking(bookingId: string) {
+        return prisma.booking.findUnique({
+            where: {
+                id: bookingId
+            }
+        })
+    }
+
+    async getBookingList() {
+        return prisma.booking.findMany();
+    }
+
+    async getBookingsByUserId(userId: string) {
+        return prisma.booking.findMany({
+            where: {
+                user_id: userId
+            }
+        })
+    }
+
 
 }

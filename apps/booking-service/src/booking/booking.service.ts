@@ -1,9 +1,10 @@
 import {
+    BadRequestException,
     ConflictException,
-    ForbiddenException,
+    ForbiddenException, HttpException,
     Inject,
     Injectable,
-    InternalServerErrorException
+    InternalServerErrorException, NotFoundException
 } from '@nestjs/common';
 import {BookingRepository} from "./infrastructure/repositories/booking.repository";
 import axios from "axios";
@@ -106,16 +107,14 @@ export class BookingService {
             throw new ConflictException("Failed while money writing-off attempt:" + paymentResponse.error);
         }
 
-        try {
-            await this.bookingRepository.activateBooking(booking.id, booking.end_time);
-            console.log("BOOKING STATUS SET ON 'ACTIVE'. EXPIRATION DATE SET ON END_TIME");
-        } catch (error: any) {
-            throw new InternalServerErrorException("Internal error while activating booking");
-        }
+        const activatedBooking = await this.bookingRepository.activateBooking(booking.id, booking.end_time);
+        console.log("BOOKING STATUS SET ON 'ACTIVE'. EXPIRATION DATE SET ON END_TIME");
 
         this.activeBookingClient.emit('booking.active', {
             coworkingId
         });
+
+        return activatedBooking;
     }
 
     @Cron(CronExpression.EVERY_MINUTE)
@@ -141,5 +140,36 @@ export class BookingService {
         }
         console.log("Воркер закончил работу." + new Date());
     }
+
+    async getBookingInfo(bookingId: string) {
+        if (!bookingId) {
+            throw new BadRequestException("Empty or invalid booking ID");
+        }
+        try {
+            const booking = await this.bookingRepository.getBooking(bookingId);
+            if (!booking) {
+                throw new BadRequestException("No booking with such ID");
+            }
+            return booking;
+        } catch (error) {
+            if (error instanceof HttpException) {
+                throw error;
+            }
+            throw new InternalServerErrorException("Internal unexpected error while getting booking");
+        }
+    }
+
+    async getBookingList() {
+        return this.bookingRepository.getBookingList();
+    }
+
+    async getBookingByUserId(userId: string) {
+        if (!userId) {
+            throw new BadRequestException("Incorrect or empty user ID");
+        }
+        return this.bookingRepository.getBookingsByUserId(userId);
+
+    }
+
 
 }
