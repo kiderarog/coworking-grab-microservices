@@ -38,6 +38,17 @@ import {ClientsModule, Transport} from "@nestjs/microservices";
                 },
             }),
         },
+        {
+            name: 'EXPIRED_BOOKING_CLIENT',
+            useFactory: () => ({
+                transport: Transport.RMQ,
+                options: {
+                    urls: ['amqp://USER:123456@rabbitmq:5672'],
+                    queue: 'booking_expired_queue',
+                    queueOptions: { durable: true },
+                },
+            }),
+        }
     ]),
         ],
     controllers: [BookingController],

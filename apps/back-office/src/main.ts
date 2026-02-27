@@ -23,6 +23,21 @@ async function bootstrap() {
         },
     });
 
+    app.connectMicroservice({
+        transport: Transport.RMQ,
+        options: {
+            urls: [
+                config.getOrThrow<string>('RMQ_URL')],
+            queue: config.getOrThrow<string>('RMQ_EXPIRED_BOOKING_QUEUE'),
+            queueOptions: {
+                durable: true,
+            },
+            noAck: false,
+            prefetchCount: 1,
+            // persistent: true
+        },
+    });
+
     const logger = new Logger();
     const port = config.getOrThrow('HTTP_PORT');
     const host = config.getOrThrow('HTTP_HOST');

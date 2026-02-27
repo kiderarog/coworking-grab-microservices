@@ -66,6 +66,24 @@ export class SpotRepository {
         });
     }
 
+    async releaseSpotByExpiredBooking(coworkingId: string) {
+        const spot = await prisma.spot.findFirst({
+            where: {
+                coworking_id: coworkingId,
+                status: 'BOOKED'
+            },
+            orderBy: { id: 'asc' }
+        });
+
+        if (!spot) {
+            return null;
+        }
+        return prisma.spot.update({
+            where: { id: spot.id },
+            data: { status: 'FREE' }
+        });
+    }
+
 
 
 

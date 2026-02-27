@@ -13,15 +13,8 @@ export class BookingRepository {
         });
     }
 
-    async changeBookingStatus(bookingId: string, status: BookingStatus) {
-        return prisma.booking.update({
-            where: { id: bookingId },
-            data: { status }
-        });
-    }
 
-    async checkExistingBooking(data: {userId: string, coworkingId: string})
-    {
+    async checkExistingBooking(data: { userId: string, coworkingId: string }) {
         return prisma.booking.count({
             where: {
                 user_id: data.userId,
@@ -32,4 +25,52 @@ export class BookingRepository {
             }
         })
     }
+
+    async activateBooking(bookingId: string, expiresAt: Date) {
+        return prisma.booking.update({
+            where: {id: bookingId},
+            data: {
+                status: BookingStatus.ACTIVE,
+                expires_at: expiresAt
+            }
+        });
+    }
+
+    async getPendingBookings() {
+        return prisma.booking.findMany({
+            where: {
+                status: BookingStatus.PENDING,
+                expires_at: {lt: new Date()}
+            }
+        })
+    }
+
+    async getExpiredBookings(date: Date) {
+        return prisma.booking.findMany({
+            where: {
+                status: BookingStatus.ACTIVE,
+                expires_at: {lt: date}
+            }
+        })
+    }
+
+    async deleteBooking(bookingId: string) {
+        return prisma.booking.delete({
+            where: {
+                id: bookingId
+            }
+        })
+    }
+
+    async changeStatusForExpiredBookings(bookingId: string) {
+        return prisma.booking.update({
+            where: {
+                id: bookingId
+            }, data: {
+                status: BookingStatus.EXPIRED
+            }
+        })
+    }
+
+
 }

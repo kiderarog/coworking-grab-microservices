@@ -15,6 +15,7 @@ import {BookingStatus} from "../../generated/prisma/enums";
 import {ClientProxy} from "@nestjs/microservices";
 import {PaymentResponseDto} from "./dto/payment-response.dto";
 import {firstValueFrom} from "rxjs";
+import {Cron, CronExpression} from "@nestjs/schedule";
 
 @Injectable()
 export class BookingService {
@@ -27,7 +28,9 @@ export class BookingService {
                 @Inject('BOOKING_CLIENT')
                 private readonly bookingClient: ClientProxy,
                 @Inject('BOOKING_ACTIVE_EVENT')
-                private readonly activeBookingClient: ClientProxy) {
+                private readonly activeBookingClient: ClientProxy,
+                @Inject('EXPIRED_BOOKING_CLIENT')
+                private readonly expiredBookingClient: ClientProxy) {
         this.bookingRepository = bookingRepository;
         this.BACK_OFFICE_SERVICE_URL = configService.getOrThrow('BACK_OFFICE_SERVICE_URL');
         this.INTERNAL_API_KEY = configService.getOrThrow('INTERNAL_API_KEY');
@@ -79,7 +82,7 @@ export class BookingService {
         const endDate = new Date(startDate);
         endDate.setDate(endDate.getDate() + dto.days);
         const expiresAt = new Date();
-        expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+        expiresAt.setMinutes(expiresAt.getMinutes() + 2);
 
         const bookingData = new CreateBookingData({
             coworking_id: coworkingId,
@@ -98,21 +101,45 @@ export class BookingService {
                 amount: bookingData.amount_of_money
             })
         );
-        console.log("СОБЫТИЕ О БРОНИРОВАНИИ ОТПРАВЛЕНО В PAYMENT SERVICE");
+        console.log("BOOKING EVENT SENT TO PAYMENT-SERVICE");
         if (paymentResponse.status !== 'success') {
             throw new ConflictException("Failed while money writing-off attempt:" + paymentResponse.error);
         }
 
-        await this.bookingRepository.changeBookingStatus(booking.id, BookingStatus.ACTIVE);
-        console.log("СТАТУС БРОНИРОВАНИЯ ИЗМЕНЕН НА ACTIVE");
+        try {
+            await this.bookingRepository.activateBooking(booking.id, booking.end_time);
+            console.log("BOOKING STATUS SET ON 'ACTIVE'. EXPIRATION DATE SET ON END_TIME");
+        } catch (error: any) {
+            throw new InternalServerErrorException("Internal error while activating booking");
+        }
 
         this.activeBookingClient.emit('booking.active', {
             coworkingId
         });
     }
 
+    @Cron(CronExpression.EVERY_MINUTE)
     async checkingBookingStatus() {
-        const now = new Date(0);
-        
+        console.log("Воркер начал работу" + new Date());
+        const now = new Date();
+        console.log("Текущее время (в ютс)", now.toISOString());
+        const pendingBookings = await this.bookingRepository.getPendingBookings();
+        console.log("Отловлено в статусе ожидание:", pendingBookings.length);
+
+        for (let pb of pendingBookings) {
+            await this.bookingRepository.deleteBooking(pb.id);
+        }
+
+        const expiredBookings = await this.bookingRepository.getExpiredBookings(now);
+        console.log("Отловлено истекших бронирований:", expiredBookings.length);
+
+        for (let eb of expiredBookings) {
+            await this.bookingRepository.changeStatusForExpiredBookings(eb.id);
+            this.expiredBookingClient.emit('booking.expired', {
+                coworkingId: eb.coworking_id,
+            });
+        }
+        console.log("Воркер закончил работу." + new Date());
     }
+
 }

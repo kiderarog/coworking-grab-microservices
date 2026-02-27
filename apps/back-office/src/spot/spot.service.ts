@@ -56,4 +56,16 @@ export class SpotService {
             throw new InternalServerErrorException("Unexpected internal error while booking spot: " + error);
         }
     }
+
+    async releaseSpot(coworkingId: string) {
+        if (!coworkingId) {
+            throw new BadRequestException("Coworking ID is required to release some spots");
+        }
+        try {
+            await this.spotRepository.releaseSpotByExpiredBooking(coworkingId);
+        } catch (error: any) {
+            throw new InternalServerErrorException("Error while releasing " + coworkingId + "spots");
+        }
+
+    }
 }
