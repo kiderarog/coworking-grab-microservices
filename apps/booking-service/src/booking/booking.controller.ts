@@ -3,6 +3,8 @@ import {BookingService} from './booking.service';
 import {Authorization, JwtPayload, Roles} from "../security";
 import type {Response, Request} from 'express';
 import {CreateBookingDto} from "./dto/create-booking-dto";
+import {CoworkingIdParamDto} from "./dto/coworking-id-param-dto";
+import {BookingIdParamDto} from "./dto/booking-id-param-dto";
 
 
 @Controller('bookings')
@@ -26,15 +28,15 @@ export class BookingController {
 
     @Post(':id')
     @Authorization()
-    async createBooking(@Req() req: Request, @Param('id') id: string, @Body() dto: CreateBookingDto) {
-        return this.bookingService.createBooking(id, (req.user as JwtPayload).id, dto);
+    async createBooking(@Req() req: Request, @Param() data: CoworkingIdParamDto, @Body() dto: CreateBookingDto) {
+        return this.bookingService.createBooking(data.id, (req.user as JwtPayload).id, dto);
     }
 
     @Get(':id')
     @Authorization()
     @Roles('ADMIN', 'SUPERADMIN')
-    async getBooking(@Param('id') id: string) {
-        return this.bookingService.getBookingInfo(id);
+    async getBooking(@Param() data: BookingIdParamDto) {
+        return this.bookingService.getBookingInfo(data.id);
     }
 
 }
