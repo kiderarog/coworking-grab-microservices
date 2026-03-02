@@ -2,11 +2,15 @@ import {NestFactory} from '@nestjs/core';
 import {AppModule} from './app.module';
 import {Transport} from "@nestjs/microservices";
 import {ConfigService} from "@nestjs/config";
+import {Logger} from "nestjs-pino";
 
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     const config = app.get(ConfigService);
+
+    const logger = app.get(Logger);
+    app.useLogger(logger);
 
     app.connectMicroservice({
         transport: Transport.RMQ,

@@ -1,12 +1,15 @@
 import {NestFactory} from '@nestjs/core';
 import {AppModule} from './app.module';
 import {ConfigService} from "@nestjs/config";
-import {Logger} from "@nestjs/common";
+import {Logger} from 'nestjs-pino';
 import {Transport} from "@nestjs/microservices";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     const config = app.get(ConfigService);
+
+    const logger = app.get(Logger);
+    app.useLogger(logger);
 
     app.connectMicroservice({
         transport: Transport.RMQ,
@@ -38,16 +41,11 @@ async function bootstrap() {
         },
     });
 
-    const logger = new Logger();
     const port = config.getOrThrow('HTTP_PORT');
     const host = config.getOrThrow('HTTP_HOST');
+    await app.startAllMicroservices();
     await app.listen(port, '0.0.0.0');
     logger.log(`Backoffice successfully started at: ${host}`);
-
-
-
-    await app.startAllMicroservices();
-    await app.init();
 }
 
 bootstrap();

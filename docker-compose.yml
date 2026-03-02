@@ -120,6 +120,8 @@ services:
     ports:
       - "4001:4001"
       - "51212:51212"
+    volumes:
+      - ./apps/auth-service/logs:/logs
 
 
   notification-service:
@@ -130,6 +132,9 @@ services:
         condition: service_healthy
     networks:
       - base_network
+    volumes:
+      - ./apps/notification-service/logs:/logs
+
 
 
   payment-service:
@@ -144,6 +149,8 @@ services:
       - base_network
     ports:
       - "4003:4003"
+    volumes:
+      - ./apps/payment-service-java/logs:/app/logs
 
 
   back-office:
@@ -161,6 +168,8 @@ services:
     ports:
       - "4004:4004"
       - "51213:51213"
+    volumes:
+      - ./apps/back-office/logs:/logs
 
   booking-service:
     build: ./apps/booking-service
@@ -175,6 +184,8 @@ services:
     ports:
       - "4005:4005"
       - "51214:51214"
+    volumes:
+      - ./apps/booking-service/logs:/logs
 
 volumes:
   auth_db_data:

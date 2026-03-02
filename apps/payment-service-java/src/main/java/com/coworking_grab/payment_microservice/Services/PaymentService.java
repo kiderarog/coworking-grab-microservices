@@ -7,6 +7,7 @@ import com.coworking_grab.payment_microservice.Events.PaymentCreatedEvent;
 import com.coworking_grab.payment_microservice.Exceptions.RabbitMessageSendException;
 import com.coworking_grab.payment_microservice.Security.JwtUtil;
 import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,11 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.util.Base64;
+import java.util.Date;
 import java.util.UUID;
 
+
+@Slf4j
 @Service
 public class PaymentService {
 
@@ -44,20 +48,20 @@ public class PaymentService {
     }
 
     public ResponseDTO createPayment(BigDecimal amount, String authHeader) {
-
-        System.out.println("SHOP ID = " + shopId);
-        System.out.println("SECRET = " + secretKey);
-
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            log.warn("Got invalid or empty authentication header");
             return new ResponseDTO("error", "Invalid or missing Authorization header");
         }
+
+        String userId = null;
+        String userEmail = null;
 
         try {
             String token = authHeader.substring(7);
             Claims claims = jwtUtil.parse(token);
-            String userId = claims.get("id", String.class);
-            String userEmail = claims.get("email", String.class);
-
+            userId = claims.get("id", String.class);
+            userEmail = claims.get("email", String.class);
+            log.info("Creating payment. userId={}, amount={}", userId, amount);
             CreatePaymentRequest req = getCreatePaymentRequest(amount, userId, userEmail);
 
             String auth = shopId + ":" + secretKey;
@@ -68,17 +72,21 @@ public class PaymentService {
                     .header("Idempotence-Key", UUID.randomUUID().toString())
                     .body(req).retrieve().body(String.class);
             Object json = objectMapper.readValue(raw, Object.class);
+            log.info("Payment created successfully. userId={}, amount={}", userId, amount);
             ResponseDTO response = new ResponseDTO("success", "Payment created");
             response.setData(json);
             response.setTimestamp(System.currentTimeMillis());
             return response;
         } catch (Exception e) {
+            log.error("Payment creation failed. userId={}, amount={}", userId, amount, e);
             return new ResponseDTO("error", "Error while creating a payment: " + e.getMessage());
         }
 
     }
 
     private static CreatePaymentRequest getCreatePaymentRequest(BigDecimal amount, String userId, String userEmail) {
+        log.debug("Created 'CreatePaymentRequest' with userId={}, amount={}, currency=RUB",
+                userId, amount);
         CreatePaymentRequest req = new CreatePaymentRequest();
 
         CreatePaymentRequest.Amount amt = new CreatePaymentRequest.Amount();
@@ -107,17 +115,29 @@ public class PaymentService {
 
     public ResponseEntity<ResponseDTO> topUpBalanceAndSendEvent(WebhookPayload webhookPayload) {
         PaymentCreatedEvent event = getPaymentCreatedEvent(webhookPayload);
+        log.info("Parsed webhook. paymentId={}, userId={}, status={}, amount={}",
+                event.getPaymentId(),
+                event.getUserId(),
+                event.getStatus(),
+                event.getAmount());
+
         if (!"succeeded".equals(event.getStatus())) {
+            log.error("Payment is not successful (ERROR). paymentId={}, status={}",
+                    event.getPaymentId(),
+                    event.getStatus());
             ResponseDTO response = new ResponseDTO("error", "Payment status is UNSUCCESSFUL");
             response.setTimestamp(System.currentTimeMillis());
             return ResponseEntity.badRequest().body(response);
         }
+
+        log.info("Topping up balance. userId={}, amount={}", event.getUserId(), event.getAmount());
         balanceService.topUpBalance(UUID.fromString(event.getUserId()), event.getAmount());
         try {
+            log.info("Sending PaymentCreatedEvent to RabbitMQ. paymentId={}, userId={}", event.getPaymentId(), event.getUserId());
             paymentProducer.sendPaymentCreatedEvent(event);
-            System.out.println("PaymentCreatedEvent sent to RabbitMQ: " + event);
-
+            log.info("PaymentCreatedEvent successfully sent. paymentId={}", event.getPaymentId());
         } catch (Exception e) {
+            log.warn("Failed to send PaymentCreatedEvent. paymentId={}, userId={}", event.getPaymentId(), event.getUserId(), e);
             throw new RabbitMessageSendException("Error while sending message to RabbitMQ", e);
         }
 
@@ -138,6 +158,7 @@ public class PaymentService {
                     webhookPayload.getObject().getMetadata().getUserEmail()
             );
         } catch (Exception e) {
+            log.error("Error while parsing webhook payload", e);
             throw new RuntimeException("Error while parsing webhook data", e);
         }
     }

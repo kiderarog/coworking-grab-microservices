@@ -4,7 +4,7 @@ import {
     ForbiddenException, HttpException,
     Inject,
     Injectable,
-    InternalServerErrorException, NotFoundException
+    InternalServerErrorException
 } from '@nestjs/common';
 import {BookingRepository} from "./infrastructure/repositories/booking.repository";
 import axios from "axios";
@@ -17,12 +17,15 @@ import {ClientProxy} from "@nestjs/microservices";
 import {PaymentResponseDto} from "./dto/payment-response.dto";
 import {firstValueFrom} from "rxjs";
 import {Cron, CronExpression} from "@nestjs/schedule";
+import {InjectPinoLogger, PinoLogger} from "nestjs-pino";
 
 @Injectable()
 export class BookingService {
     private readonly bookingRepository: BookingRepository;
     private readonly BACK_OFFICE_SERVICE_URL: string;
     private readonly INTERNAL_API_KEY: string;
+    @InjectPinoLogger(BookingService.name)
+    private readonly logger: PinoLogger;
 
 
     constructor(bookingRepository: BookingRepository, private readonly configService: ConfigService,
@@ -50,6 +53,7 @@ export class BookingService {
             }
         );
         if (existingBooking > 0) {
+            this.logger.warn({coworkingId, userId}, 'User already has active or pending booking');
             throw new ForbiddenException("You already have active or pending booking into this coworking");
         }
         let coworkingInternalData: CoworkingInternalDataDto;
@@ -67,15 +71,18 @@ export class BookingService {
                 response.data.availableSpots,
                 response.data.priceForDay,
                 response.data.priceForMonth);
-
+            this.logger.info({coworkingId, data: coworkingInternalData}, 'Received internal coworking data');
         } catch (error: any) {
+            this.logger.error({error, coworkingId}, 'Back-office service error (booking-service requester)');
             throw new InternalServerErrorException("Back-office service error");
         }
 
         if (coworkingInternalData.isFrozen) {
+            this.logger.warn({coworkingId}, 'Coworking is frozen');
             throw new ForbiddenException("Coworking is frozen by administrator");
         }
         if (coworkingInternalData.availableSpots === 0) {
+            this.logger.warn({coworkingId}, 'No free spots available');
             throw new ConflictException("Here is NO available free spaces for booking");
         }
 
@@ -95,6 +102,7 @@ export class BookingService {
             expires_at: expiresAt
         });
 
+        this.logger.info({bookingData}, 'Initializing booking in repository');
         const booking = await this.bookingRepository.initializeBooking(bookingData);
         const paymentResponse = await firstValueFrom(
             this.bookingClient.send<PaymentResponseDto>('payment_request', {
@@ -102,35 +110,36 @@ export class BookingService {
                 amount: bookingData.amount_of_money
             })
         );
-        console.log("BOOKING EVENT SENT TO PAYMENT-SERVICE");
+        this.logger.info({bookingId: booking.id, paymentResponse}, 'Payment request sent (from booking to payment)');
         if (paymentResponse.status !== 'success') {
+            this.logger.warn({bookingId: booking.id, error: paymentResponse.error}, 'Payment failed');
             throw new ConflictException("Failed while money writing-off attempt:" + paymentResponse.error);
         }
 
         const activatedBooking = await this.bookingRepository.activateBooking(booking.id, booking.end_time);
-        console.log("BOOKING STATUS SET ON 'ACTIVE'. EXPIRATION DATE SET ON END_TIME");
+        this.logger.info({bookingId: booking.id}, "Booking activated and expiration set");
 
         this.activeBookingClient.emit('booking.active', {
             coworkingId
         });
+        this.logger.info({bookingId: booking.id, coworkingId}, "Booking.active event sent (to back-office)");
 
         return activatedBooking;
     }
 
     @Cron(CronExpression.EVERY_MINUTE)
     async checkingBookingStatus() {
-        console.log("Воркер начал работу" + new Date());
+        this.logger.info("Booking status checker started (scheduler every minute)");
         const now = new Date();
-        console.log("Текущее время (в ютс)", now.toISOString());
         const pendingBookings = await this.bookingRepository.getPendingBookings();
-        console.log("Отловлено в статусе ожидание:", pendingBookings.length);
-
+        this.logger.info({count: pendingBookings.length}, "Pending bookings found (counted amount)");
         for (let pb of pendingBookings) {
             await this.bookingRepository.deleteBooking(pb.id);
+            this.logger.info({bookingId: pb.id}, "Deleted pending booking(s)");
         }
 
         const expiredBookings = await this.bookingRepository.getExpiredBookings(now);
-        console.log("Отловлено истекших бронирований:", expiredBookings.length);
+        this.logger.info({count: expiredBookings.length}, "Expired bookings found (counted amount)");
 
         for (let eb of expiredBookings) {
             await this.bookingRepository.changeStatusForExpiredBookings(eb.id);
@@ -138,21 +147,30 @@ export class BookingService {
                 coworkingId: eb.coworking_id,
             });
         }
-        console.log("Воркер закончил работу." + new Date());
+        this.logger.info("Booking checker finished" + now);
+        this.logger.info({
+            pendingCount: pendingBookings.length,
+            expiredCount: expiredBookings.length
+        }, 'Booking status check completed');
     }
 
     async getBookingInfo(bookingId: string) {
         if (!bookingId) {
+            this.logger.warn('Empty or invalid booking ID');
             throw new BadRequestException("Empty or invalid booking ID");
         }
         try {
             const booking = await this.bookingRepository.getBooking(bookingId);
             if (!booking) {
+                this.logger.warn({bookingId}, 'Booking not found by this ID');
                 throw new BadRequestException("No booking with such ID");
             }
+
+            this.logger.info({bookingId}, 'Booking info retrieved successfully');
             return booking;
         } catch (error) {
             if (error instanceof HttpException) {
+                this.logger.error({error, bookingId}, 'Unexpected error while getting booking info');
                 throw error;
             }
             throw new InternalServerErrorException("Internal unexpected error while getting booking");
@@ -160,16 +178,16 @@ export class BookingService {
     }
 
     async getBookingList() {
+        this.logger.info('Booking list was requested');
         return this.bookingRepository.getBookingList();
     }
 
     async getBookingByUserId(userId: string) {
         if (!userId) {
+            this.logger.warn('Empty or invalid user ID');
             throw new BadRequestException("Incorrect or empty user ID");
         }
+        this.logger.info({userId: userId}, 'Retrieved bookings by userId');
         return this.bookingRepository.getBookingsByUserId(userId);
-
     }
-
-
 }
