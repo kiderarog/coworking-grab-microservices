@@ -3,6 +3,7 @@ import {AppModule} from './app.module';
 import {ConfigService} from "@nestjs/config";
 import {Logger} from 'nestjs-pino';
 import {Transport} from "@nestjs/microservices";
+import {ValidationPipe} from "@nestjs/common";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -10,6 +11,15 @@ async function bootstrap() {
 
     const logger = app.get(Logger);
     app.useLogger(logger);
+
+    app.useGlobalPipes(
+        new ValidationPipe({
+            whitelist: true,
+            forbidNonWhitelisted: true,
+            transform: true,
+            transformOptions: { enableImplicitConversion: true },
+        }),
+    );
 
     app.connectMicroservice({
         transport: Transport.RMQ,

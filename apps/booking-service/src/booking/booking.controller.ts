@@ -1,7 +1,7 @@
 import {Body, Controller, Get, Param, Post, Req} from '@nestjs/common';
 import {BookingService} from './booking.service';
 import {Authorization, JwtPayload, Roles} from "../security";
-import type {Response, Request} from 'express';
+import type {Request} from 'express';
 import {CreateBookingDto} from "./dto/create-booking-dto";
 import {CoworkingIdParamDto} from "./dto/coworking-id-param-dto";
 import {BookingIdParamDto} from "./dto/booking-id-param-dto";

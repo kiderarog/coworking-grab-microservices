@@ -3,6 +3,7 @@ import {AppModule} from './app.module';
 import {ConfigService} from '@nestjs/config';
 import cookieParser from 'cookie-parser';
 import {Logger} from 'nestjs-pino';
+import {ValidationPipe} from "@nestjs/common";
 
 
 async function bootstrap() {
@@ -12,6 +13,15 @@ async function bootstrap() {
     app.use(cookieParser());
     const logger = app.get(Logger);
     app.useLogger(logger);
+
+    app.useGlobalPipes(
+        new ValidationPipe({
+            whitelist: true,
+            forbidNonWhitelisted: true,
+            transform: true,
+            transformOptions: { enableImplicitConversion: true },
+        }),
+    );
 
     const config = app.get(ConfigService);
 
