@@ -4,6 +4,9 @@ import {ConfigService} from "@nestjs/config";
 import {Logger} from 'nestjs-pino';
 import {Transport} from "@nestjs/microservices";
 import {ValidationPipe} from "@nestjs/common";
+import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
+import { Request, Response } from 'express';
+
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -20,6 +23,21 @@ async function bootstrap() {
             transformOptions: { enableImplicitConversion: true },
         }),
     );
+
+    const swaggerConfig = new DocumentBuilder()
+        .setTitle('Back office')
+        .setDescription('Back-Office microservice')
+        .setVersion('1.0')
+        .addTag('BackOffice')
+        .build();
+
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+
+    const expressApp = app.getHttpAdapter().getInstance();
+
+    expressApp.get('/docs-json', (_req: Request, res: Response) => {
+        res.json(document);
+    });
 
     app.connectMicroservice({
         transport: Transport.RMQ,

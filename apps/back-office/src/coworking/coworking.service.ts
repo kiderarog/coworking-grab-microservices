@@ -6,6 +6,8 @@ import {UpdateCoworkingDto} from "./dto/update-coworking-dto";
 import {prisma} from "../prisma";
 import {CoworkingInfoDto} from "./dto/coworking-info.dto";
 import {InjectPinoLogger, PinoLogger} from "nestjs-pino";
+import {CoworkingResponseDto} from "./dto/coworking-response-dto";
+import {CoworkingFreezeStatusDto} from "./dto/coworking-freeze-status-dto";
 
 
 @Injectable()
@@ -35,7 +37,15 @@ export class CoworkingService {
                     amount_of_spots: dto.amountOfSpots
                 });
                 this.logger.info({coworking_id: coworking.id}, 'Coworking successfully created');
-                return coworking;
+                const createdCoworking = new CoworkingResponseDto();
+                createdCoworking.id = coworking.id;
+                createdCoworking.name = coworking.name;
+                createdCoworking.description = coworking.description;
+                createdCoworking.location = coworking.location;
+                createdCoworking.priceForDay = Number(coworking.price_for_day);
+                createdCoworking.priceForMonth = Number(coworking.price_for_month);
+
+                return createdCoworking;
             })
         } catch (error: any) {
             this.logger.error({error, name: dto.name}, 'Error while creating coworking');
@@ -60,7 +70,15 @@ export class CoworkingService {
                 price_for_month: dto.priceForMonth
             });
             this.logger.info({coworking_id: updatedCoworking.id}, 'Coworking successfully updated');
-            return updatedCoworking;
+            const updatedCoworkingDtoInstance = new CoworkingResponseDto();
+            updatedCoworkingDtoInstance.id = updatedCoworking.id;
+            updatedCoworkingDtoInstance.name = updatedCoworking.name;
+            updatedCoworkingDtoInstance.description = updatedCoworking.description;
+            updatedCoworkingDtoInstance.location = updatedCoworking.location;
+            updatedCoworkingDtoInstance.priceForDay = Number(updatedCoworking.price_for_day);
+            updatedCoworkingDtoInstance.priceForMonth = Number(updatedCoworking.price_for_month);
+
+            return updatedCoworkingDtoInstance;
         } catch (error: any) {
             if (error.code === 'P2025') {
                 this.logger.error({coworking_id: coworkingId}, 'Coworking not found (update error)');
@@ -81,13 +99,18 @@ export class CoworkingService {
             if (coworking) {
                 let frozenOrNot = !coworking.isFrozen;
                 this.logger.info({coworking_id: coworkingId, new_state: frozenOrNot}, 'Freeze status updated');
-                return this.coworkingRepository.updateFreezeState(coworkingId, frozenOrNot);
+                await this.coworkingRepository.updateFreezeState(coworkingId, frozenOrNot);
+                const freezeStatusDto = new CoworkingFreezeStatusDto();
+                freezeStatusDto.isFrozen = frozenOrNot;
+                return freezeStatusDto;
             } else {
                 this.logger.warn({coworking_id: coworkingId}, 'Coworking not found (freeze status changing');
                 throw new NotFoundException("No such coworking");
             }
+
         } catch (error: any) {
-            this.logger.error({error, coworking_id: coworkingId}, 'Unexpected error while changing freeze status');            if (error.code === 'P2025') {
+            this.logger.error({error, coworking_id: coworkingId}, 'Unexpected error while changing freeze status');
+            if (error.code === 'P2025') {
                 this.logger.warn({coworking_id: coworkingId}, 'Coworking not found');
                 throw new NotFoundException("Coworking not found");
             }
@@ -98,7 +121,20 @@ export class CoworkingService {
 
     async getCoworkingsList() {
         try {
-            return this.coworkingRepository.findAllCoworkingSpaces();
+            const coworkings = await this.coworkingRepository.findAllCoworkingSpaces();
+            const result: CoworkingResponseDto[] = [];
+            for (const c of coworkings) {
+                const dto = new CoworkingResponseDto();
+                dto.id = c.id;
+                dto.name = c.name;
+                dto.description = c.description;
+                dto.location = c.location;
+                dto.priceForDay = Number(c.price_for_day);
+                dto.priceForMonth = Number(c.price_for_month);
+                result.push(dto);
+            }
+
+            return result;
         } catch (error) {
             this.logger.error({error}, 'Error while getting coworking list');
             throw new InternalServerErrorException("Error while getting coworking list");
@@ -108,11 +144,21 @@ export class CoworkingService {
     async getCoworking(coworkingId: string) {
         try {
             const coworking = await this.coworkingRepository.findCoworkingById(coworkingId);
+
             if (!coworking) {
                 this.logger.warn({coworking_id: coworkingId}, 'Coworking not found');
                 throw new NotFoundException("Coworking not found");
             }
-            return coworking;
+
+            const result = new CoworkingResponseDto();
+            result.id = coworking.id;
+            result.name = coworking.name;
+            result.description = coworking.description;
+            result.location = coworking.location;
+            result.priceForDay = Number(coworking.price_for_day);
+            result.priceForMonth = Number(coworking.price_for_month);
+            return result;
+
         } catch (error) {
             this.logger.error({error, coworking_id: coworkingId}, 'Error while getting coworking by id');
             throw new InternalServerErrorException("Error while getting coworking by ID");

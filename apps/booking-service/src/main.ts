@@ -4,9 +4,11 @@ import {ConfigService} from "@nestjs/config";
 import cookieParser from "cookie-parser";
 import {Logger} from "nestjs-pino";
 import {ValidationPipe} from "@nestjs/common";
+import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
+import { Request, Response } from 'express';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, { bufferLogs: true });
     app.use(cookieParser());
     const config = app.get(ConfigService);
 
@@ -22,7 +24,20 @@ async function bootstrap() {
         }),
     );
 
+    const swaggerConfig = new DocumentBuilder()
+        .setTitle('Booking Service')
+        .setDescription('Booking microservice')
+        .setVersion('1.0')
+        .addTag('Booking')
+        .build();
 
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+
+    const expressApp = app.getHttpAdapter().getInstance();
+
+    expressApp.get('/docs-json', (_req: Request, res: Response) => {
+        res.json(document);
+    });
 
     const port = config.getOrThrow('HTTP_PORT');
     const host = config.getOrThrow('HTTP_HOST');

@@ -18,6 +18,7 @@ import {PaymentResponseDto} from "./dto/payment-response.dto";
 import {firstValueFrom} from "rxjs";
 import {Cron, CronExpression} from "@nestjs/schedule";
 import {InjectPinoLogger, PinoLogger} from "nestjs-pino";
+import {BookingResponseDto} from "./dto/booking-response-dto";
 
 @Injectable()
 export class BookingService {
@@ -124,7 +125,7 @@ export class BookingService {
         });
         this.logger.info({bookingId: booking.id, coworkingId}, "Booking.active event sent (to back-office)");
 
-        return activatedBooking;
+        return this.mapToBookingResponseDto(activatedBooking);
     }
 
     @Cron(CronExpression.EVERY_MINUTE)
@@ -165,9 +166,9 @@ export class BookingService {
                 this.logger.warn({bookingId}, 'Booking not found by this ID');
                 throw new BadRequestException("No booking with such ID");
             }
-
             this.logger.info({bookingId}, 'Booking info retrieved successfully');
-            return booking;
+            return this.mapToBookingResponseDto(booking);
+
         } catch (error) {
             if (error instanceof HttpException) {
                 this.logger.error({error, bookingId}, 'Unexpected error while getting booking info');
@@ -179,15 +180,39 @@ export class BookingService {
 
     async getBookingList() {
         this.logger.info('Booking list was requested');
-        return this.bookingRepository.getBookingList();
+        const bookings = await this.bookingRepository.getBookingList();
+        const bookingList: BookingResponseDto[] = [];
+        for (const booking of bookings) {
+            bookingList.push(this.mapToBookingResponseDto(booking));
+        }
+        return bookingList;
     }
 
-    async getBookingByUserId(userId: string) {
+    async getBookingsByUserId(userId: string) {
         if (!userId) {
             this.logger.warn('Empty or invalid user ID');
             throw new BadRequestException("Incorrect or empty user ID");
         }
         this.logger.info({userId: userId}, 'Retrieved bookings by userId');
-        return this.bookingRepository.getBookingsByUserId(userId);
+        const bookings = await this.bookingRepository.getBookingsByUserId(userId);
+        const bookingList: BookingResponseDto[] = [];
+        for (const booking of bookings) {
+            bookingList.push(this.mapToBookingResponseDto(booking));
+        }
+        return bookingList;
+    }
+
+    private mapToBookingResponseDto(booking: any): BookingResponseDto {
+        const dto = new BookingResponseDto();
+        dto.id = booking.id;
+        dto.coworkingId = booking.coworking_id;
+        dto.userId = booking.user_id;
+        dto.startTime = booking.start_time;
+        dto.endTime = booking.end_time;
+        dto.amountOfMoney = Number(booking.amount_of_money);
+        dto.status = booking.status;
+        dto.createdAt = booking.created_at;
+        dto.expiresAt = booking.expires_at;
+        return dto;
     }
 }

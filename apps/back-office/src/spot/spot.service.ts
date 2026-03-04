@@ -8,6 +8,7 @@ import {
 import {SpotRepository} from "./infrastructure/repositories/spot.repository";
 import {CoworkingRepository} from "../coworking/infrastructure/repositories/coworking.repository";
 import {InjectPinoLogger, PinoLogger} from "nestjs-pino";
+import {SpotResponseDto} from "./dto/spot-response-dto";
 
 @Injectable()
 export class SpotService {
@@ -35,7 +36,18 @@ export class SpotService {
         try {
             const spots = await this.spotRepository.getSpotsByCoworkingId(coworkingId);
             this.logger.info({coworking_id: coworkingId, count: spots?.length}, `All spots ${spots.length} successfully got by coworkingId`);
-            return spots;
+            const spotResponseList: SpotResponseDto[] = [];
+
+            for (const spot of spots) {
+                const spotResponse = new SpotResponseDto();
+                spotResponse.id = spot.id;
+                spotResponse.spotNumber = spot.spot_number;
+                spotResponse.status = spot.status;
+                spotResponse.coworkingId = spot.coworking_id;
+                spotResponseList.push(spotResponse);
+            }
+            return spotResponseList;
+
         } catch (error) {
             this.logger.error({err: error, coworking_id: coworkingId}, 'Error while getting spots');
             throw new InternalServerErrorException("Error while getting spots for some coworking" + error);

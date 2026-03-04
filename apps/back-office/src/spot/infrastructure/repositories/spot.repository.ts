@@ -1,7 +1,6 @@
 import {Injectable} from "@nestjs/common";
 import {prisma} from "../../../prisma";
-import {Spot} from "../../../../generated/prisma/client";
-import {async} from "rxjs";
+
 
 
 @Injectable()

@@ -1,9 +1,17 @@
+import {ApiProperty} from "@nestjs/swagger";
+
 export class CoworkingInfoDto {
+    @ApiProperty()
     coworkingId: string;
+    @ApiProperty()
     isFrozen: boolean;
+    @ApiProperty()
     totalSpots: number;
+    @ApiProperty()
     availableSpots: number;
+    @ApiProperty()
     priceForDay: number;
+    @ApiProperty()
     priceForMonth: number;
 
 

@@ -97,7 +97,14 @@ services:
     build: ./apps/api-gateway
     env_file: ./apps/api-gateway/.env
     depends_on:
-      - auth-service
+      auth-service:
+        condition: service_started
+      payment-service:
+        condition: service_started
+      back-office:
+        condition: service_started
+      booking-service:
+        condition: service_started
     networks:
       - base_network
     ports:

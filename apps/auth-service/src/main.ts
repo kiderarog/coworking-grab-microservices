@@ -5,13 +5,16 @@ import cookieParser from 'cookie-parser';
 import {Logger} from 'nestjs-pino';
 import {ValidationPipe} from "@nestjs/common";
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
+import { Request, Response } from 'express';
 
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
         bufferLogs: true,
     });
+
     app.use(cookieParser());
+
     const logger = app.get(Logger);
     app.useLogger(logger);
 
@@ -39,8 +42,11 @@ async function bootstrap() {
 
     const document = SwaggerModule.createDocument(app, swaggerConfig);
 
-    SwaggerModule.setup('docs', app, document);
+    const expressApp = app.getHttpAdapter().getInstance();
 
+    expressApp.get('/docs-json', (_req: Request, res: Response) => {
+        res.json(document);
+    });
     await app.listen(port, '0.0.0.0');
 
     logger.log(`Auth-service started: ${host}`);
